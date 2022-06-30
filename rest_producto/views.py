@@ -29,7 +29,7 @@ def lista_productos(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @csrf_exempt
-@api_view(['GET','PUT','DELETe'])
+@api_view(['GET','PUT','DELETE'])
 def detalle_producto(request,id_producto):
     """ 
     Get, update o delete de un producto en especifico.
