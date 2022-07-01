@@ -11,18 +11,23 @@ from rest_framework.authtoken.models import Token
 
 @api_view(['POST'])
 def login(request):
-    data = JSONParser().parse(request)
+    try:
+        data = JSONParser().parse(request)
     
-    username = data['username']
-    password = data['password']
+        username = data['username']
+        password = data['password']
+    except:
+        return Response("Campos del Body deben ser username y password")
+    
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
         return Response("Usuario no se encuentra en los registros")
+    
     pass_valido = check_password(password, user.password)
     if not pass_valido:
         return Response("Contraseña incorrecta, intente nuevamente.")
     token, create = Token.objects.get_or_create(user=user)
     return Response(token.key)
 
-    
+# Create your views here.

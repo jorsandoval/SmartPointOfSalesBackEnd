@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_producto',
     'rest_venta',
     'rest_framework.authtoken',
+    'rest_auth',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +90,12 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ], 
+    }
 
 
 # Password validation
