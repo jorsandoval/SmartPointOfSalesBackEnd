@@ -1,16 +1,19 @@
 from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
 from core.models import Venta, DetalleVenta, MedioPago
 from .serializers import DetalleVentaSerializer, MedioPagoSerializer, VentaSerializer
-# Create your views here.
+
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 #EndPoint de Ventas
 @csrf_exempt
 @api_view(['GET','POST'])
+@permission_classes((IsAuthenticated,))
 def lista_ventas(request):
     """
     Lista todas las ventas realizadas
@@ -31,6 +34,7 @@ def lista_ventas(request):
 #EndPoint de Detalle de las ventas
 @csrf_exempt
 @api_view(['GET','POST'])
+@permission_classes((IsAuthenticated,))
 def lista_detalle_ventas(request):
     """ 
     Lista todos los detalle de las ventas realizadas
@@ -51,6 +55,7 @@ def lista_detalle_ventas(request):
 #EndPoint de medio de pago
 @csrf_exempt
 @api_view(['GET','POST'])
+@permission_classes((IsAuthenticated,))
 def lista_medio_pagos(request):
     """ 
     Lista todos los medios de pagos existetes
@@ -68,38 +73,70 @@ def lista_medio_pagos(request):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#EndPoint de los detalles
+#EndPoint de las ventas detalladas por ID
 @csrf_exempt
 @api_view(['GET','PUT','DELETE'])
-def detalle_venta(request,id_venta):
+@permission_classes((IsAuthenticated,))
+def venta_detalle(request,id_venta):
     """ 
     Get, update o delete de una venta en especifico.
     Recibe el parametro <id_venta>
     """
     try:
-        venta = Venta.objects.get(id_venta=id_venta)
+        venta_detalle = Venta.objects.get(id_venta=id_venta)
     except Venta.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        serializer = VentaSerializer(venta)
+        serializer = VentaSerializer(venta_detalle)
         return Response(serializer.data)
     if request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = VentaSerializer(venta, data=data)
+        serializer = VentaSerializer(venta_detalle, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'DELETE':
-        venta.delete()
+        venta_detalle.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+#EndPoint de los detalle_venta referenciados por ID
+@csrf_exempt
+@api_view(['GET','PUT','DELETE'])
+@permission_classes((IsAuthenticated,))
+def detalle_venta(request,id_detalle_venta):
+    """ 
+    Get, update o delete de un detalle de venta.
+    Recibe el parametro <id_detalle_venta>
+    """
+    try:
+        detalle_venta = DetalleVenta.objects.get(id_detalle_venta=id_detalle_venta)
+    except DetalleVenta.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        serializer = VentaSerializer(detalle_venta)
+        return Response(serializer.data)
+    if request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = VentaSerializer(detalle_venta, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        detalle_venta.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 @csrf_exempt
 @api_view(['GET','PUT','DELETE'])
+@permission_classes((IsAuthenticated,))
 def detalle_medio_pago(request,id_medio_pago):
     """ 
-    Get, update o delete de una venta en especifico.
+    Get, update o delete de un medio de pago en especifico.
     Recibe el parametro <id_medio_pago>
     """
     try:

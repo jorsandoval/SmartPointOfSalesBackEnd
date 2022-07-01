@@ -35,6 +35,7 @@ def lista_clientes(request):
 
 @csrf_exempt
 @api_view(['GET','PUT','DELETE'])
+@permission_classes((IsAuthenticated,))
 def detalle_cliente(request,id_cliente):
     """ 
     Get, update o delete de un cliente en especifico.
@@ -44,9 +45,11 @@ def detalle_cliente(request,id_cliente):
         cliente = Cliente.objects.get(id_cliente=id_cliente)
     except Cliente.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    
     if request.method == 'GET':
         serializer = ClienteSerializer(cliente)
         return Response(serializer.data)
+    
     if request.method == 'PUT':
         data = JSONParser().parse(request)
         serializer = ClienteSerializer(cliente, data=data)
