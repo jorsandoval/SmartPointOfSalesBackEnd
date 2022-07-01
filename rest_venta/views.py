@@ -116,11 +116,11 @@ def detalle_venta(request,id_detalle_venta):
     except DetalleVenta.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        serializer = VentaSerializer(detalle_venta)
+        serializer = DetalleVentaSerializer(detalle_venta)
         return Response(serializer.data)
     if request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = VentaSerializer(detalle_venta, data=data)
+        serializer = DetalleVentaSerializer(detalle_venta, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -148,7 +148,7 @@ def detalle_medio_pago(request,id_medio_pago):
         return Response(serializer.data)
     if request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = VentaSerializer(medio_pago, data=data)
+        serializer = MedioPagoSerializer(medio_pago, data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
